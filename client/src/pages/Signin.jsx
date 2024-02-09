@@ -2,15 +2,22 @@ import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
 
 export default function Signin() {
   const [logInUserData, setLoginUserData] = useState({});
-  const [loading, setLoading] = useState(false);
+  const {loading} = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     try {
+      dispatch(signInStart());
       const res = await fetch("api/auth/signin", {
         method: "POST",
         headers: {
@@ -19,18 +26,16 @@ export default function Signin() {
         body: JSON.stringify(logInUserData),
       });
       const data = await res.json();
-      setLoading(false);
       if (data.errorMsg) {
-        console.log('dataErrorMSg====>',data);
-        toast.error(data.errorMsg)
-      }else{
-        console.log("data====>", data);
-        toast.success('You Have Landed Successfully')
+        dispatch(signInFailure(data.errorMsg));
+        toast.error(data.errorMsg);
+      } else {
+        dispatch(signInSuccess(data));
+        toast.success("You Have Landed Successfully");
         setTimeout(() => navigate("/"), 3000);
       }
     } catch (error) {
-      setLoading(false);
-      console.log("catched error====>", error);
+     dispatch(signInFailure(error.errorMsg));
     }
   };
   const handleChange = (e) => {
