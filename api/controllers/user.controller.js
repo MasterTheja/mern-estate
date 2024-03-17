@@ -29,3 +29,16 @@ export const updateUser = async(req, res, next) =>{
         next(error)
     }
 }
+ 
+export const deleteUser = async(req, res, next) =>{
+    console.log("Backend delete user==>",req)
+    if(req.user.id !== req.params.id) return next(errorHandler(401, 'You can only update you account!'))
+    const userId=(req.params.id);
+
+    try{
+        
+        delete User[userId];
+    }catch{
+        error
+    }
+}
