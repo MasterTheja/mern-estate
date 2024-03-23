@@ -3,7 +3,8 @@ import { useSelector } from "react-redux";
 import { useRef } from "react";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable} from "firebase/storage";
 import { app } from '../firebase'
-import { updateUserStart, updateUserFailure, updateUserSuccess, deleteUserFailure, deleteUserStart, deleteUserSuccess } from "../redux/user/userSlice";
+import { updateUserStart, updateUserFailure, updateUserSuccess, deleteUserFailure, deleteUserStart, deleteUserSuccess,
+signoutUserStart, signoutUserFailure, signoutUserSuccess } from "../redux/user/userSlice";
 import  {useDispatch}from "react-redux"; 
 
 export default function Profile() {
@@ -62,6 +63,7 @@ export default function Profile() {
         body: JSON.stringify(formData)
       }); 
       const data = await res.json();
+      console.log("update user response===>", data)
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
       }else{
@@ -74,7 +76,6 @@ export default function Profile() {
   }
 
   const deleteAccount=async()=>{
-    console.log("deleted")
     try{
       dispatch(deleteUserStart());
 
@@ -87,18 +88,38 @@ export default function Profile() {
         body: JSON.stringify(formData)
       });
       const data = await res.json();
+      console.log("Backend delete user==>",data)
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
       }else{
         dispatch (deleteUserSuccess(data))
+        return;
       }
     }catch(error){
       dispatch(deleteUserFailure(error.message));
-    }
-    }
+    };
+    };
+
+    const signoutAccount=async()=>{
+      console.log("signout action")
+      try{
+        dispatch(signoutUserStart());
+  
+        const res = await fetch('api/auth/signout');
+        const data = await res.json();
+        console.log("User signout data==>",data)
+        if (data.success === false) {
+          dispatch(signoutUserFailure(data.message));
+        }else{
+          dispatch (signoutUserSuccess(data))
+          return;
+        }
+      }catch(error){
+        dispatch(signoutUserFailure(error.message));
+      };
+    };
   
 
-    
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -152,9 +173,8 @@ export default function Profile() {
       </form>
       <div className="flex justify-between mt-5">
         <span onClick={deleteAccount} className="text-red-700 cursor-pointer">Delete account</span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span onClick={signoutAccount} className="text-red-700 cursor-pointer">Sign out</span>
       </div>
-      <h2>Listing</h2>
     </div>
   );
 }
