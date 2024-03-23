@@ -22,23 +22,22 @@ export const updateUser = async(req, res, next) =>{
                 password: req.body.password,
                 avatar: req.body.avatar,
             }
-        }, {new: true})
+        }, {new: true});
         const {password, ...rest} = updatedUser._doc;
-        res.status(200).json(rest)
+        res.status(200).json(rest);
     }catch(error){
         next(error)
-    }
-}
- 
+    };
+}; 
 export const deleteUser = async(req, res, next) =>{
-    console.log("Backend delete user==>",req)
-    if(req.user.id !== req.params.id) return next(errorHandler(401, 'You can only update you account!'))
+    if(req.user.id !== req.params.id) return next(errorHandler(401, 'You can only update your account!'));
     const userId=(req.params.id);
-
     try{
+        await User.findByIdAndDelete(userId);
+        res.clearCookie('access_token');
+        res.status(200).json();
         
-        delete User[userId];
     }catch{
-        error
+        next(error);
     }
 }
