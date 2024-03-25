@@ -6,6 +6,8 @@ import { app } from '../firebase'
 import { updateUserStart, updateUserFailure, updateUserSuccess, deleteUserFailure, deleteUserStart, deleteUserSuccess,
 signoutUserStart, signoutUserFailure, signoutUserSuccess } from "../redux/user/userSlice";
 import  {useDispatch}from "react-redux"; 
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Profile() {
   const fileRef=useRef(null)
@@ -15,6 +17,7 @@ export default function Profile() {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(()=>{
     if(file){
@@ -78,7 +81,7 @@ export default function Profile() {
   const deleteAccount=async()=>{
     try{
       dispatch(deleteUserStart());
-
+      console.log("Backend delete user==>",currentUser._id)
       const res = await fetch(`api/user/delete/${currentUser._id}`,
       {
         method:'DELETE',
@@ -92,8 +95,12 @@ export default function Profile() {
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
       }else{
-        dispatch (deleteUserSuccess(data))
-        return;
+        if (data == "User deleted successfully") {
+          dispatch (deleteUserSuccess(data))
+          console.log('detaed userrrrrrrrrrrr====>@@@@@',data)
+          toast.success(" Your Account deleted successfully ");
+          setTimeout(() => navigate("/sign-in"), 2000);
+        }  
       }
     }catch(error){
       dispatch(deleteUserFailure(error.message));

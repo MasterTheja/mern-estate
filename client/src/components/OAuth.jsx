@@ -26,9 +26,12 @@ export default function OAuth() {
         }),
       });
       const data = await res.json();
-      dispatch(signInSuccess(data));
-      toast.success(" You are On Boarded ");
-      setTimeout(() => navigate("/"), 2000);
+      console.log('dataGoogle=====>',data)
+      if(data._id){
+        dispatch(signInSuccess(data));
+        toast.success(" You are On Boarded ");
+        setTimeout(() => navigate("/"), 2000);
+      }
     } catch (error) {
       console.log("Coould not able to SignIn with Google", error);
     }
