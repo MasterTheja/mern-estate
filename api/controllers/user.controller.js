@@ -24,6 +24,7 @@ export const updateUser = async(req, res, next) =>{
             }
         }, {new: true});
         const {password, ...rest} = updatedUser._doc;
+        //const userUpdates = {"userUpdate":"user upadated successfully"};
         res.status(200).json(rest);
     }catch(error){
         next(error)
@@ -35,7 +36,6 @@ export const deleteUser = async(req, res, next) =>{
     try{
         await User.findByIdAndDelete(userId);
         res.clearCookie('access_token');
-        console.log('deleteUser=====>',req, 'userId===>',)
         res.status(200).json('User deleted successfully');
         
     }catch{
