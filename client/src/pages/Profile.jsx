@@ -70,7 +70,7 @@ export default function Profile() {
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
       }else{
-        dispatch (updateUserSuccess(data))
+        dispatch (updateUserSuccess(data));
       }
     }catch(error){
       dispatch(updateUserFailure(error.message));
@@ -81,7 +81,6 @@ export default function Profile() {
   const deleteAccount=async()=>{
     try{
       dispatch(deleteUserStart());
-      console.log("Backend delete user==>",currentUser._id)
       const res = await fetch(`api/user/delete/${currentUser._id}`,
       {
         method:'DELETE',
@@ -91,15 +90,13 @@ export default function Profile() {
         body: JSON.stringify(formData)
       });
       const data = await res.json();
-      console.log("Backend delete user==>",data)
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
       }else{
+        dispatch (deleteUserSuccess(data))
         if (data == "User deleted successfully") {
-          dispatch (deleteUserSuccess(data))
-          console.log('detaed userrrrrrrrrrrr====>@@@@@',data)
           toast.success(" Your Account deleted successfully ");
-          setTimeout(() => navigate("/sign-in"), 2000);
+          setTimeout(() => navigate("/sign-in"), 1000);
         }  
       }
     }catch(error){
@@ -114,12 +111,14 @@ export default function Profile() {
   
         const res = await fetch('api/auth/signout');
         const data = await res.json();
-        console.log("User signout data==>",data)
         if (data.success === false) {
           dispatch(signoutUserFailure(data.message));
         }else{
-          dispatch (signoutUserSuccess(data))
-          return;
+          dispatch (deleteUserSuccess(data))
+          if (data == "user has been logged out") {
+            toast.success(" Your Account has been logged out successfully ");
+            setTimeout(() => navigate("/sign-in"), 1000);
+          }
         }
       }catch(error){
         dispatch(signoutUserFailure(error.message));
